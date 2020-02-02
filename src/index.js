@@ -1,15 +1,18 @@
-/*** DOM ELEMENTS ***/
+    /*** DOM ELEMENTS ***/
 const dogBar = document.querySelector("#dog-bar");
 const dogInfo = document.querySelector("#dog-info");
 const goodDogFilter = document.querySelector("#good-dog-filter");
 
-/*** EVENT LISTENERS ***/
+
+    /*** EVENT LISTENERS ***/
 dogBar.addEventListener("click", handleDogSelect);
 dogInfo.addEventListener("click", handleGoodDogToggle);
+goodDogFilter.addEventListener("click", handleGoodDogFilter);
 
-/*** EVENT HELPERS ***/
 
-// handles clicking a dog on the nav-bar and rendering its info
+    /*** EVENT HELPERS ***/
+
+// Handles clicking a dog on the nav-bar and rendering its info
 function handleDogSelect(event) {
   if (event.target.dataset.action === "doggo-span") {
     parentSpan = event.target.closest("span");
@@ -19,7 +22,7 @@ function handleDogSelect(event) {
   };
 };
 
-// handles toggling a dog from good to bad (and back) with its button
+// Handles toggling a dog between Good/Bad with its button
 function handleGoodDogToggle(event) {
   if (event.target.dataset.action === "good-dog-toggle") {
     let toggleGoodDogButton = event.target;
@@ -34,9 +37,25 @@ function handleGoodDogToggle(event) {
   }
 };
 
-/*** FETCHES ***/
+// Handles toggling the Good Dog Filter on/off
+function handleGoodDogFilter(event) {
+  let goodDogs = dogArray.filter( dog => dog.isGoodDog === true )
 
-// fetch dog info into global array + render names
+  if (goodDogFilter.textContent === "Filter good dogs: OFF") {
+    goodDogFilter.textContent = "Filter good dogs: ON";
+    clearChildren(dogBar);
+    allDogsOnBar(goodDogs);
+  } else {
+    goodDogFilter.textContent = "Filter good dogs: OFF";
+    clearChildren(dogBar);
+    allDogsOnBar(dogArray);
+  }
+};
+
+
+    /*** FETCHES ***/
+
+// Fetch dog info into global array + render names
 let dogArray = []
 
 fetch('http://localhost:3000/pups')
@@ -48,7 +67,7 @@ fetch('http://localhost:3000/pups')
   allDogsOnBar(json);
 });
 
-// update dog info with isGoodDog status
+// Update dog info with isGoodDog status
 const updateGoodDogStatus = function(dogId, goodDogStatus) {
   fetch(`http://localhost:3000/pups/${dogId}`, {
     method: "PATCH",
@@ -62,9 +81,10 @@ const updateGoodDogStatus = function(dogId, goodDogStatus) {
   })
 }
 
-/*** RENDER FUNCTIONS ***/
 
-// functions to get dog names on navbar
+    /*** RENDER FUNCTIONS ***/
+
+// Functions to get dog names on navbar
 function oneDogOnBar(dog) {
   dogSpan = document.createElement("span");
   dogSpan.dataset.action = "doggo-span"
@@ -75,11 +95,9 @@ function allDogsOnBar(dogs) {
   dogs.forEach( dog => oneDogOnBar(dog));
 };
 
-// function to render clicked-on doggo to the main body
+// Renders the clicked-on doggo's info to the main body
 function renderDogInfoToPage(dogObj) {
-  while (dogInfo.firstChild) {
-    dogInfo.removeChild(dogInfo.firstChild);
-  };
+  clearChildren(dogInfo);
 
   let showDogImg = document.createElement("img");
   showDogImg.src = dogObj.image;
@@ -92,10 +110,18 @@ function renderDogInfoToPage(dogObj) {
   } else {
     goodDogButton.textContent = "Bad Dog!";
   };
-
   dogInfo.append(showDogImg);
   dogInfo.append(showDogName);
   dogInfo.append(goodDogButton);
 };
+
+    /*** MISC. FUNCTIONS ***/
+
+// clears an element by removing all its children
+function clearChildren(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+}
 
 
